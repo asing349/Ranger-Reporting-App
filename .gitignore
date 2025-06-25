@@ -1,0 +1,24 @@
+# Global ignores
+node_modules/
+.env
+.env.*
+.DS_Store
+dist/
+build/
+*.log
+.vscode/
+coverage/
+*.local
+
+# Ignore dependencies in both client and server
+client/node_modules/
+server/node_modules/
+
+# Ignore React build
+client/build/
+
+# Ignore editor and OS junk
+*.swp
+*.swo
+*.tmp
+*.bak
