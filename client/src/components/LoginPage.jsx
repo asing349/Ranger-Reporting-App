@@ -25,13 +25,18 @@ export default function LoginPage({ setUser }) {
       setMetricsLoading(true);
 
       // Status metrics
-      const statusCounts = {};
-      for (const status of ["new", "monitoring", "resolved"]) {
+      const dbStatuses = ["New", "Monitoring", "resolved"];
+      const uiKeys = ["new", "monitoring", "resolved"];
+      const statusCounts = {}; // ✅ FIX: initialize before using
+
+      for (let i = 0; i < dbStatuses.length; i++) {
+        const dbStatus = dbStatuses[i];
+        const uiKey = uiKeys[i];
         const { count } = await supabase
           .from("ranger_reports")
           .select("*", { count: "exact", head: true })
-          .eq("status", status);
-        statusCounts[status] = count || 0;
+          .eq("status", dbStatus);
+        statusCounts[uiKey] = count || 0;
       }
 
       // Condition metrics
@@ -56,6 +61,7 @@ export default function LoginPage({ setUser }) {
         moderate,
         bad,
       });
+
       setMetricsLoading(false);
     };
 
