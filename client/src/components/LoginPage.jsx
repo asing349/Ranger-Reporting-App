@@ -19,12 +19,12 @@ export default function LoginPage({ setUser }) {
   const [metricsLoading, setMetricsLoading] = useState(true);
   const navigate = useNavigate();
 
-  // ---- Line 19: Metrics Fetcher ----
+  // ---- Metrics Fetcher ----
   useEffect(() => {
     const fetchMetrics = async () => {
       setMetricsLoading(true);
 
-      // Status metrics (lines 23-32)
+      // Status metrics
       const statusCounts = {};
       for (const status of ["new", "monitoring", "resolved"]) {
         const { count } = await supabase
@@ -34,11 +34,10 @@ export default function LoginPage({ setUser }) {
         statusCounts[status] = count || 0;
       }
 
-      // Condition metrics (lines 34-46)
+      // Condition metrics
       let good = 0,
         moderate = 0,
         bad = 0;
-      // Instead of separate queries, fetch all conditions and count in JS for safety!
       const { data: allConditions } = await supabase
         .from("ranger_reports")
         .select("condition");
@@ -63,18 +62,21 @@ export default function LoginPage({ setUser }) {
     fetchMetrics();
   }, []);
 
-  // ---- Login Handler (unchanged) ----
+  // ---- Login Handler ----
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     try {
-      const response = await fetch("http://localhost:5050/api/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password, role }),
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/api/login`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, password, role }),
+        }
+      );
 
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Login failed");
@@ -132,8 +134,7 @@ export default function LoginPage({ setUser }) {
                 label="Resolved"
                 count={metrics.resolved}
                 color="bg-yellow-900"
-              />{" "}
-              {/* Brown */}
+              />
             </div>
           )}
           {/* Condition Title */}
