@@ -1,7 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "../utils/supabaseClient";
-import bcrypt from "bcryptjs";
 
 // Simple email validation regex
 function isValidEmail(email) {
@@ -55,22 +53,26 @@ export default function RegisterPage() {
       return;
     }
     try {
-      // Hash the password using bcryptjs
-      const salt = bcrypt.genSaltSync(10);
-      const password_hash = bcrypt.hashSync(form.password, salt);
-
-      // Insert into Supabase
-      const { error } = await supabase.from("pending_ranger_requests").insert([
+      // Send raw password to backend for hashing
+      const response = await fetch(
+        `${
+          import.meta.env.VITE_BACKEND_URL || "http://localhost:5050"
+        }/api/register`,
         {
-          name: form.name,
-          ranger_id: form.ranger_id,
-          email: form.email,
-          password_hash,
-        },
-      ]);
-      if (error) throw new Error(error.message);
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: form.name,
+            ranger_id: form.ranger_id,
+            email: form.email,
+            password: form.password,
+          }),
+        }
+      );
 
-      // Redirect to Thank You page
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Registration failed");
+
       navigate("/thank-you");
     } catch (err) {
       setError(err.message);

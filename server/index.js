@@ -16,7 +16,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// ✅ Correct route mounting
+// ✅ Mount register route
+app.use("/api/register", require("./routes/register"));
+
 app.use("/api", require("./routes/auth"));
 app.use("/api/report", require("./routes/report"));
 
