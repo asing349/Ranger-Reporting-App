@@ -7,6 +7,7 @@ export default function LogoutButton() {
     localStorage.removeItem("user");
     localStorage.removeItem("token");
     navigate("/login");
+    window.location.reload();
   };
 
   return (

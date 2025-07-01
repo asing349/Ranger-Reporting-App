@@ -54,7 +54,6 @@ export default function Form() {
     <div className="min-h-screen bg-gray-100 p-4">
       <div className="flex justify-between items-center mb-4 max-w-md mx-auto">
         <h2 className="text-2xl font-bold">📋 Ranger Report</h2>
-        <LogoutButton />
       </div>
 
       <form
