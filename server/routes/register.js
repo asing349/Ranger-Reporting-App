@@ -1,6 +1,6 @@
 const express = require("express");
-const bcrypt = require("bcryptjs");
 const router = express.Router();
+const { hashPassword } = require("../utils/hash"); // Import hashPassword
 
 router.post("/", async (req, res) => {
   try {
@@ -10,8 +10,8 @@ router.post("/", async (req, res) => {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
-    // Hash the password securely
-    const password_hash = bcrypt.hashSync(password, 10);
+    // Hash the password securely using the async hashPassword
+    const password_hash = await hashPassword(password);
 
     // Save to Supabase (pending_ranger_requests table)
     const { data, error } = await global.supabase
