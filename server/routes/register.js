@@ -16,24 +16,21 @@ router.post("/", async (req, res) => {
     // Save to Supabase (pending_ranger_requests table)
     const { data, error } = await global.supabase
       .from("pending_ranger_requests")
-      .insert([{ name, ranger_id, email, password_hash }]);
+      .insert([{ name, ranger_id, email, password_hash }])
+      .select();
 
     if (error) throw new Error(error.message);
     if (!data || !data[0]) {
-      return res
-        .status(500)
-        .json({
-          error: "Registration failed: No data returned from database.",
-        });
+      return res.status(500).json({
+        error: "Registration failed: No data returned from database.",
+      });
     }
 
-    res
-      .status(201)
-      .json({
-        success: true,
-        message: "Registration successful",
-        data: data[0],
-      });
+    res.status(201).json({
+      success: true,
+      message: "Registration successful",
+      data: data[0],
+    });
   } catch (err) {
     console.error("Register error:", err);
     res.status(500).json({ error: "Registration failed" });
