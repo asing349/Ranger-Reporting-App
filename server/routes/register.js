@@ -19,8 +19,21 @@ router.post("/", async (req, res) => {
       .insert([{ name, ranger_id, email, password_hash }]);
 
     if (error) throw new Error(error.message);
+    if (!data || !data[0]) {
+      return res
+        .status(500)
+        .json({
+          error: "Registration failed: No data returned from database.",
+        });
+    }
 
-    res.status(201).json({ message: "Registration successful", data: data[0] });
+    res
+      .status(201)
+      .json({
+        success: true,
+        message: "Registration successful",
+        data: data[0],
+      });
   } catch (err) {
     console.error("Register error:", err);
     res.status(500).json({ error: "Registration failed" });
