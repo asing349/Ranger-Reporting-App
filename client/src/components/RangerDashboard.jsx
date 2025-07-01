@@ -2,99 +2,82 @@ import { useState, useEffect } from "react";
 import { supabase } from "../utils/supabaseClient";
 import Form from "./Form";
 import LogoutButton from "./LogoutButton";
+import EditReportModal from "./EditReportModal"; // <-- Import the new modal
 import exifr from "exifr";
 
 export default function RangerDashboard() {
   const [activeTab, setActiveTab] = useState("myreports");
   const [assignedReports, setAssignedReports] = useState([]);
   const [submittedReports, setSubmittedReports] = useState([]);
-  const [selectedReport, setSelectedReport] = useState(null);
+  const [selectedReport, setSelectedReport] = useState(null); // For the edit modal
   const [detailModal, setDetailModal] = useState(null);
-  const [editNotes, setEditNotes] = useState("");
-  const [editCondition, setEditCondition] = useState("");
-  const [imageUploading, setImageUploading] = useState(false);
-  const [statusUpdating, setStatusUpdating] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
   const [refresh, setRefresh] = useState(false);
 
   const user = JSON.parse(localStorage.getItem("user"));
 
-  // Fetch assigned and submitted reports
+  // Fetch reports
   useEffect(() => {
     async function fetchReports() {
       if (!user?.id) return;
-      // Assigned to this ranger (assigned_to matches this user's id)
       const { data: assigned } = await supabase
         .from("ranger_reports")
         .select("*")
         .eq("assigned_to", user.id);
-
-      // Reports submitted by this ranger (ranger_id matches this user's id)
       const { data: submitted } = await supabase
         .from("ranger_reports")
         .select("*")
         .eq("ranger_id", user.id);
-
       setAssignedReports(assigned || []);
       setSubmittedReports(submitted || []);
     }
     fetchReports();
   }, [refresh, user?.id]);
 
-  // --- Edit handlers ---
-  const openEdit = (report, e) => {
-    e.stopPropagation();
-    setSelectedReport(report);
-    setEditNotes(report.notes || "");
-    setEditCondition(report.condition || "");
-  };
+  // --- Update handler for the new modal ---
+  const handleUpdateReport = async (updatedReport) => {
+    setIsUpdating(true);
+    const { imageFile, ...reportData } = updatedReport;
 
-  const handleSave = async () => {
-    if (!selectedReport) return;
+    // 1. Upload new image if provided
+    if (imageFile) {
+      const gps = await exifr.gps(imageFile);
+      const formData = new FormData();
+      formData.append("image", imageFile);
+      formData.append("reportId", reportData.id);
+
+      const res = await fetch("http://localhost:5050/api/report/image", {
+        method: "POST",
+        body: formData,
+      });
+      const { imageUrl } = await res.json();
+
+      reportData.image_url = imageUrl;
+      reportData.latitude = gps?.latitude || reportData.latitude;
+      reportData.longitude = gps?.longitude || reportData.longitude;
+    }
+
+    // 2. Update the report in Supabase
     await supabase
       .from("ranger_reports")
-      .update({ notes: editNotes, condition: editCondition })
-      .eq("id", selectedReport.id);
-    setSelectedReport(null);
-    setRefresh((r) => !r);
+      .update(reportData)
+      .eq("id", reportData.id);
+
+    setIsUpdating(false);
+    setSelectedReport(null); // Close modal
+    setRefresh((r) => !r); // Refresh data
   };
 
   // --- Status handler ---
-  const handleStatusUpdate = async (report, newStatus, e) => {
-    e.stopPropagation();
-    setStatusUpdating(true);
+  const handleMarkResolved = async (report) => {
+    setIsUpdating(true);
     await supabase
       .from("ranger_reports")
-      .update({ status: newStatus })
+      .update({ status: "resolved" })
       .eq("id", report.id);
-    setStatusUpdating(false);
-    setSelectedReport(null);
-    setRefresh((r) => !r);
-  };
-
-  // --- Image handler ---
-  const handleImageChange = async (e, report) => {
-    e.stopPropagation();
-    setImageUploading(true);
-    const file = e.target.files[0];
-    const gps = await exifr.gps(file);
-    const formData = new FormData();
-    formData.append("image", file);
-    formData.append("reportId", report.id);
-    const res = await fetch("http://localhost:5050/api/report/image", {
-      method: "POST",
-      body: formData,
-    });
-    const { imageUrl } = await res.json();
-    await supabase
-      .from("ranger_reports")
-      .update({
-        image_url: imageUrl,
-        latitude: gps?.latitude || "",
-        longitude: gps?.longitude || "",
-      })
-      .eq("id", report.id);
-    setImageUploading(false);
-    setRefresh((r) => !r);
+    setIsUpdating(false);
+    setSelectedReport(null); // Close modal
+    setRefresh((r) => !r); // Refresh data
   };
 
   // --- Table renderer ---
@@ -127,34 +110,26 @@ export default function RangerDashboard() {
               <td className="p-2">{r.condition}</td>
               <td className="p-2">{r.notes?.slice(0, 40)}</td>
               <td className="p-2">{r.assigned_to || "-"}</td>
-              <td className="p-2">{r.status}</td>
-              <td className="p-2 flex gap-2">
-                <button
-                  className="bg-blue-100 px-2 py-1 rounded text-xs"
-                  onClick={(e) => openEdit(r, e)}
-                >
-                  Edit
-                </button>
-                {type === "assigned" && (
-                  <>
-                    <button
-                      className="bg-green-200 px-2 py-1 rounded text-xs"
-                      disabled={statusUpdating}
-                      onClick={(e) => handleStatusUpdate(r, "resolved", e)}
-                    >
-                      Mark Resolved
-                    </button>
-                    <label className="bg-yellow-100 px-2 py-1 rounded text-xs cursor-pointer">
-                      {imageUploading ? "Uploading..." : "Replace Image"}
-                      <input
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={(e) => handleImageChange(e, r)}
-                        disabled={imageUploading}
-                      />
-                    </label>
-                  </>
+              <td className="p-2">
+                {r.status === "resolved" ? (
+                  <span className="bg-green-200 text-green-800 px-2 py-1 rounded-full text-xs font-semibold">
+                    Resolved
+                  </span>
+                ) : (
+                  r.status
+                )}
+              </td>
+              <td className="p-2">
+                {r.status !== "resolved" && type === "assigned" && (
+                  <button
+                    className="bg-blue-100 px-2 py-1 rounded text-xs hover:bg-blue-200"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedReport(r);
+                    }}
+                  >
+                    Edit / Resolve
+                  </button>
                 )}
               </td>
             </tr>
@@ -164,7 +139,7 @@ export default function RangerDashboard() {
     </div>
   );
 
-  // --- Report details modal ---
+  // --- Report details modal (no changes here) ---
   const ReportDetailModal = ({ report, onClose }) => {
     if (!report) return null;
     return (
@@ -315,49 +290,14 @@ export default function RangerDashboard() {
         />
       )}
 
-      {/* Edit Modal */}
+      {/* Edit/Resolve Modal */}
       {selectedReport && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-20">
-          <div className="bg-white p-6 rounded-xl shadow-lg max-w-sm w-full">
-            <h3 className="text-lg font-bold mb-2">Edit Report</h3>
-            <div className="space-y-2">
-              <div>
-                <label className="block text-xs">Notes:</label>
-                <textarea
-                  className="w-full border p-2 rounded"
-                  value={editNotes}
-                  onChange={(e) => setEditNotes(e.target.value)}
-                />
-              </div>
-              <div>
-                <label className="block text-xs">Condition:</label>
-                <select
-                  className="w-full border p-2 rounded"
-                  value={editCondition}
-                  onChange={(e) => setEditCondition(e.target.value)}
-                >
-                  <option>Good</option>
-                  <option>Moderate</option>
-                  <option>Bad</option>
-                </select>
-              </div>
-            </div>
-            <div className="flex justify-end gap-2 mt-4">
-              <button
-                onClick={handleSave}
-                className="bg-blue-600 text-white px-3 py-1 rounded"
-              >
-                Save
-              </button>
-              <button
-                onClick={() => setSelectedReport(null)}
-                className="bg-gray-200 px-3 py-1 rounded"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
+        <EditReportModal
+          report={selectedReport}
+          onClose={() => setSelectedReport(null)}
+          onUpdate={handleUpdateReport}
+          onMarkResolved={handleMarkResolved}
+        />
       )}
     </div>
   );
