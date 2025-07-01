@@ -10,6 +10,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@getbrevo/brevo": "^2.2.0",
     "@supabase/supabase-js": "^2.50.0",
     "bcrypt": "^6.0.0",
     "cloudinary": "^2.6.1",

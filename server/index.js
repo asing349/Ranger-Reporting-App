@@ -21,6 +21,7 @@ app.use("/api/register", require("./routes/register"));
 
 app.use("/api", require("./routes/auth"));
 app.use("/api/report", require("./routes/report"));
+app.use("/api/admin", require("./routes/admin"));
 
 app.listen(5050, () => {
   console.log("✅ Server running on port 5050");

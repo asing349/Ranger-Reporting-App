@@ -113,6 +113,7 @@ export default function RangersPanel() {
       if (deleteErr) throw deleteErr;
 
       // No need to update UI manually; reload will happen
+      await sendNotificationEmail(pendingRanger.email, "enabled");
     } catch (err) {
       setError("Error approving ranger: " + err.message);
     }
@@ -163,8 +164,29 @@ export default function RangersPanel() {
       if (deleteErr) throw deleteErr;
 
       // No need to update UI manually; reload will happen
+      await sendNotificationEmail(ranger.email, "disabled");
     } catch (err) {
       setError("Error disabling ranger: " + err.message);
+    }
+  };
+
+  const sendNotificationEmail = async (email, status) => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/api/admin/notify-ranger`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, status }),
+        }
+      );
+      if (!response.ok) {
+        console.error("Failed to send notification email");
+      }
+    } catch (error) {
+      console.error("Error sending notification email:", error);
     }
   };
 
