@@ -120,17 +120,15 @@ export default function RangerDashboard() {
                 )}
               </td>
               <td className="p-2">
-                {r.status !== "resolved" && type === "assigned" && (
-                  <button
-                    className="bg-blue-100 px-2 py-1 rounded text-xs hover:bg-blue-200"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSelectedReport(r);
-                    }}
-                  >
-                    Edit / Resolve
-                  </button>
-                )}
+                <button
+                  className="bg-blue-100 px-2 py-1 rounded text-xs hover:bg-blue-200"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedReport(r);
+                  }}
+                >
+                  Edit
+                </button>
               </td>
             </tr>
           ))}
