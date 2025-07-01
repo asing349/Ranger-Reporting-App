@@ -37,31 +37,40 @@ export default function RangerDashboard() {
   // --- Update handler for the new modal ---
   const handleUpdateReport = async (updatedReport) => {
     setIsUpdating(true);
-    const { imageFile, ...reportData } = updatedReport;
+    const { imageFile, id, notes, condition } = updatedReport;
 
-    // 1. Upload new image if provided
+    const updates = {
+      notes,
+      condition,
+    };
+
     if (imageFile) {
-      const gps = await exifr.gps(imageFile);
-      const formData = new FormData();
-      formData.append("image", imageFile);
-      formData.append("reportId", reportData.id);
+      try {
+        // Get GPS data from the new image
+        const gps = await exifr.gps(imageFile);
+        if (gps && gps.latitude && gps.longitude) {
+          updates.latitude = gps.latitude;
+          updates.longitude = gps.longitude;
+        }
 
-      const res = await fetch("http://localhost:5050/api/report/image", {
-        method: "POST",
-        body: formData,
-      });
-      const { imageUrl } = await res.json();
+        // Upload the new image
+        const formData = new FormData();
+        formData.append("image", imageFile);
+        formData.append("reportId", id);
 
-      reportData.image_url = imageUrl;
-      reportData.latitude = gps?.latitude || reportData.latitude;
-      reportData.longitude = gps?.longitude || reportData.longitude;
+        const res = await fetch("http://localhost:5050/api/report/image", {
+          method: "POST",
+          body: formData,
+        });
+        const { imageUrl } = await res.json();
+        updates.image_url = imageUrl;
+      } catch (error) {
+        console.error("Error processing image:", error);
+      }
     }
 
-    // 2. Update the report in Supabase
-    await supabase
-      .from("ranger_reports")
-      .update(reportData)
-      .eq("id", reportData.id);
+    // Update the report in Supabase with all the changes
+    await supabase.from("ranger_reports").update(updates).eq("id", id);
 
     setIsUpdating(false);
     setSelectedReport(null); // Close modal
