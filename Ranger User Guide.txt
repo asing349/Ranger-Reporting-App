@@ -1,0 +1,56 @@
+Ranger User Guide
+==================
+
+Welcome to the Ranger App! This guide will help you get started and make the most of your experience.
+
+1. Sign Up (Create Your Account)
+--------------------------------
+- Go to the registration page.
+- Fill in your full name, your ranger ID, your email address, and choose a password.
+- Click the "Register" button.
+- If everything is correct, you'll see a message saying your registration was successful. You'll then be taken to the login page.
+
+2. Log In
+---------
+- On the login page, enter your email and password.
+- Click the "Login" button.
+- If your details are correct, you'll be taken to your personal dashboard.
+
+3. Your Dashboard
+-----------------
+- Here, you can see:
+  - Reports that have been assigned to you.
+  - Reports you have submitted in the past.
+- You can click on any report to see more details.
+
+4. Submit a New Report
+----------------------
+- Click the button or link to submit a new report.
+- The form will already have your name and ID filled in.
+- Choose the condition you want to report (for example: Good, Moderate, or Bad).
+- Add any notes you want to include.
+- Upload a photo if needed (the app may use your photo's location to fill in the GPS automatically).
+- Click "Submit."
+- You'll see a message confirming your report was submitted.
+
+5. Manage Your Assigned Reports
+-------------------------------
+- In your dashboard, you'll see a list of reports assigned to you.
+- You can:
+  - Add or edit notes.
+  - Change the condition if needed.
+  - Upload or replace photos.
+  - Mark a report as "resolved" when you've finished with it.
+
+6. Log Out
+----------
+- When you're done, click the "Logout" button to safely exit your account.
+
+Summary
+-------
+- Sign up to create your account.
+- Log in to access your dashboard.
+- Submit new reports and manage your assigned reports easily.
+- Log out when finished.
+
+If you ever have trouble, look for help or support options in the app, or contact your administrator. 

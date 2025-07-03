@@ -1,0 +1,61 @@
+Admin User Guide
+=================
+
+Welcome to the Ranger App! This guide will help you, as an admin, manage rangers and reports easily.
+
+1. Log In
+---------
+- Go to the login page.
+- Enter your admin email and password.
+- Click the "Login" button.
+- If your details are correct, you'll be taken to the admin dashboard.
+
+2. Admin Dashboard
+------------------
+- Here, you can see an overview of all ranger reports and activities.
+- The dashboard has different tabs, such as:
+  - **Reports:** View all submitted reports.
+  - **Monitoring:** See reports that need attention or are being monitored.
+  - **Resolved:** View reports that have been marked as resolved.
+  - **Rangers:** Manage ranger accounts and assignments.
+- You can assign reports to rangers directly from the main dashboard.
+
+3. Reviewing Reports
+--------------------
+- Click on the "Reports" tab to see all reports submitted by rangers.
+- Click on any report to see more details, including:
+  - Ranger name and ID
+  - Condition and notes
+  - Location and photo (if provided)
+  - Status (New, Monitoring, Resolved)
+- You can update the status of a report or add admin notes if needed.
+
+4. Monitoring and Resolving Reports
+-----------------------------------
+- Use the "Monitoring" tab to keep track of reports that need ongoing attention.
+- When a report is resolved, you can mark it as "Resolved" in the app.
+- The "Resolved" tab shows all completed reports for your records.
+
+5. Managing Rangers
+-------------------
+- Go to the "Rangers" tab to see a list of all rangers.
+- You can:
+  - View ranger details
+  - Assign reports to rangers
+  - Approve or manage new ranger registrations (if required)
+- When you approve or disapprove a ranger's registration, an automatic email will be sent to inform them of your decision.
+
+6. Logging Out
+--------------
+- When you're done, click the "Logout" button to safely exit your admin account.
+
+Summary
+-------
+- Log in to access your admin dashboard.
+- Review, monitor, and resolve ranger reports.
+- Manage ranger accounts and assignments.
+- Assign reports and approve rangers directly from the dashboard.
+- Automatic emails are sent to rangers when their registration is approved or disapproved.
+- Log out when finished.
+
+If you ever have trouble, look for help or support options in the app, or contact your technical support team. 
